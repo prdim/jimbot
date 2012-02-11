@@ -43,7 +43,7 @@ public class StartDos {
             BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream(),"windows-1251"));
             String line;
             while((line = in.readLine()) != null) {
-                if (!line.equals("")) s += line + '\n';
+                if (!line.isEmpty()) s += line + '\n';
             }
             in.close();
             process.destroy();            

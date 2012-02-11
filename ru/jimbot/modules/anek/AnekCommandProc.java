@@ -33,7 +33,7 @@ import ru.jimbot.modules.AbstractServer;
 import ru.jimbot.modules.Cmd;
 import ru.jimbot.modules.CommandParser;
 import ru.jimbot.modules.WorkScript;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 import ru.jimbot.util.MainProps;
 
@@ -58,7 +58,7 @@ public class AnekCommandProc extends AbstractCommandProcessor {
         uq = new ConcurrentHashMap<String,StateUin>();
     }
         
-    private void firstMsg(IcqProtocol proc){
+    private void firstMsg(Protocol proc){
     	if(!firstStartMsg){
     		String[] s = srv.getProps().getAdmins();
     		for(int i=0;i<s.length;i++){
@@ -77,12 +77,12 @@ public class AnekCommandProc extends AbstractCommandProcessor {
     	return srv;
     }
     
-    public void parse(IcqProtocol proc, String uin, String msg) {
+    public void parse(Protocol proc, String uin, String msg) {
     	firstMsg(proc);
     	String s = WorkScript.getInstance(srv.getName()).startAnekScript("main", proc, this, uin, msg);
     }   
     
-    public void commandExec(IcqProtocol proc, String uin, Vector v){
+    public void commandExec(Protocol proc, String uin, Vector v){
         if(!AnekProps.getInstance(srv.getName()).testAdmin(uin)){
             proc.mq.add(uin,"Вы не имеете доступа к данной команде.");
             return;
@@ -90,7 +90,7 @@ public class AnekCommandProc extends AbstractCommandProcessor {
         try{
             String s = (String)v.get(0);
             String s1 = WorkScript.getInstance(srv.getName()).startCommandScript(s, proc, srv, uin, (String)v.get(1));
-            if(!s1.equals(""))
+            if(!s1.isEmpty())
                 proc.mq.add(uin,"Ошибка при выполнении: " + s1);
         }catch(Exception ex){
             ex.printStackTrace();
@@ -101,7 +101,7 @@ public class AnekCommandProc extends AbstractCommandProcessor {
     /**
      * Добавление анекдота
      */
-    public void commandAdd(IcqProtocol proc, String uin, Vector v){
+    public void commandAdd(Protocol proc, String uin, Vector v){
         try {
             OutputStreamWriter ow = new OutputStreamWriter(new FileOutputStream("./temp_aneks.txt",true),"windows-1251");
             String s = (String)v.get(0) + "\n\n";
@@ -160,13 +160,13 @@ public class AnekCommandProc extends AbstractCommandProcessor {
      * Возвращает наименее загруженный номер 
      * @return
      */
-    public IcqProtocol getFreeUin(){
-    	IcqProtocol u = null;
+    public Protocol getFreeUin(){
+    	Protocol u = null;
     	int k = 99;
     	int c = 0;
     	for(int i=0;i<srv.getProps().uinCount();i++){
     		if(srv.getIcqProcess(i).isOnLine()){
-    			c = srv.getIcqProcess(i).getOuteqSize();
+    			c = srv.getIcqProcess(i).mq.size();
     			if(c==0) return srv.getIcqProcess(i);
     			if(k>c){
     				k = c;

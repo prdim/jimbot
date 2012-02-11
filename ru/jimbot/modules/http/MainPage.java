@@ -21,6 +21,7 @@ package ru.jimbot.modules.http;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -251,7 +252,7 @@ public class MainPage extends HttpServlet {
     	for(int i=0;i<Manager.getInstance().getService(ns).getProps().uinCount();i++){
     		con.print(">> " + Manager.getInstance().getService(ns).getProps().getUin(i) + 
     				(Manager.getInstance().getService(ns).getIcqProcess(i).isOnLine() ? "  [ ON]  " : "  [OFF]  ") +
-    				Manager.getInstance().getService(ns).getIcqProcess(i).getOuteqSize() + 
+    				Manager.getInstance().getService(ns).getIcqProcess(i).mq.size() +
     				", потери:" + Manager.getInstance().getService(ns).getIcqProcess(i).mq.getLostMsgCount() + "<br>");
     	}
     	con.print("<br>Статистика принятых сообщений по номерам:<br>");
@@ -404,7 +405,7 @@ public class MainPage extends HttpServlet {
     	}
     	String ns = con.get("ns");
     	String type = con.get("type");
-    	if(ns.equals("")){
+    	if(ns.isEmpty()){
     		printMsg(con,"srvs_create","Пустое имя сервиса!");
     		return;
     	}
@@ -482,7 +483,7 @@ public class MainPage extends HttpServlet {
     		return;
     	}
     	for(int i=0;i<Manager.getInstance().getService(ns).getProps().uinCount();i++){
-    		if(!con.get("pass_"+i).equals(""))
+    		if(!con.get("pass_"+i).isEmpty())
     			Manager.getInstance().getService(ns).getProps().setUin(i, con.get("uin_"+i), con.get("pass_"+i));
     	}
     	Manager.getInstance().getService(ns).getProps().save();
@@ -738,7 +739,7 @@ public class MainPage extends HttpServlet {
             return;
         }
         String gr = con.get("gr");
-        if(gr.equals("")){
+        if(gr.isEmpty()){
             printMsg(con,"user_group_props","Пустое имя группы!");
             return;
         }
@@ -775,12 +776,11 @@ public class MainPage extends HttpServlet {
         Map m = ((ChatCommandProc)Manager.getInstance().getService(ns).cmd).getAuthObjects();
         HashSet[] grs = new HashSet[gr.length];
         for(int i=0; i<gr.length; i++){
-            grs[i] = new HashSet<String>();
+            grs[i] = new HashSet<String>(au.size());
             try {
                 String[] s = Manager.getInstance().getService(ns).getProps().getStringProperty("auth.group_"+gr[i]).split(";");
                 if(s.length>0)
-                    for(int j=0;j<s.length; j++)
-                        grs[i].add(s[j]);
+                    grs[i].addAll(Arrays.asList(s));
             } catch (Exception ex) {}
         }
         String s = "<FORM METHOD=POST ACTION=\"" + con.getURI() +
@@ -824,12 +824,11 @@ public class MainPage extends HttpServlet {
         Set<String> au = ((ChatCommandProc)Manager.getInstance().getService(ns).cmd).getAuthObjects().keySet();
         HashSet[] grs = new HashSet[gr.length];
         for(int i=0; i<gr.length; i++){
-            grs[i] = new HashSet<String>();
+            grs[i] = new HashSet<String>(au.size());
             try {
                 String[] s = Manager.getInstance().getService(ns).getProps().getStringProperty("auth.group_"+gr[i]).split(";");
                 if(s.length>0)
-                    for(int j=0;j<s.length; j++)
-                        grs[i].add(s[j]);
+                    grs[i].addAll(Arrays.asList(s));
             } catch (Exception ex) {}
         }
         for(int i=0; i<gr.length; i++){
@@ -870,7 +869,7 @@ public class MainPage extends HttpServlet {
             return;
         }
         String gr = con.get("gr");
-        if(gr.equals("")){
+        if(gr.isEmpty()){
             printMsg(con,"user_group_props","Пустое имя группы!");
             return;
         }
@@ -896,7 +895,7 @@ public class MainPage extends HttpServlet {
     
     public void printMsg(HttpConnection con, String pg, String msg) throws IOException {
         String ns = con.get("ns");
-        ns = ns.equals("") ? "" : "&ns="+ns;
+        ns = ns.isEmpty() ? "" : "&ns="+ns;
         con.print(SrvUtil.HTML_HEAD +
                 "<TITLE>JimBot "+MainProps.VERSION+" </TITLE></HEAD><BODY><H3><FONT COLOR=\"#004000\">" +
                 msg + " </FONT></H3>");

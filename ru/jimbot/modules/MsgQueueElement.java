@@ -19,7 +19,7 @@
 package ru.jimbot.modules;
 
 import ru.jimbot.modules.chat.Users;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 
 /**
  * Элемент очереди сообщений
@@ -38,7 +38,7 @@ public class MsgQueueElement {
     public int info_type = 0;
     public long time = 0;
     public int type = 0;
-    public IcqProtocol proc;
+    public Protocol proc;
     
     /** Creates a new instance of MsgQueueElement */
     public MsgQueueElement(String _sn, String _msg) {
@@ -61,7 +61,7 @@ public class MsgQueueElement {
         time = System.currentTimeMillis();
     }
 
-    public MsgQueueElement(String _sn, String _msg, IcqProtocol pr) {
+    public MsgQueueElement(String _sn, String _msg, Protocol pr) {
         sn = _sn;
         msg = _msg;
         time = System.currentTimeMillis();

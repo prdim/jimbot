@@ -18,7 +18,7 @@
 
 package ru.jimbot.modules.chat;
 
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 
 /**
  *
@@ -28,9 +28,9 @@ import ru.jimbot.protocol.IcqProtocol;
         public String msg="";
         public String uin="";
         public int room;
-        public IcqProtocol proc;
+        public Protocol proc;
         
-        MsgElement(String m, String u, IcqProtocol p, int room) {
+        MsgElement(String m, String u, Protocol p, int room) {
             msg = m;
             uin = u;
             proc = p;

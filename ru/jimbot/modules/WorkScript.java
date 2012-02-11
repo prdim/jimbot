@@ -26,7 +26,7 @@ import ru.jimbot.modules.anek.AnekCommandProc;
 import ru.jimbot.modules.chat.ChatCommandProc;
 import ru.jimbot.modules.chat.RobAdmin;
 import ru.jimbot.modules.http.HttpConnection;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 import bsh.Interpreter;
 
@@ -146,7 +146,7 @@ private String sn=""; // Имя сервиса
      * @return - текстовый результат работы скрипта
      */
     public String startChatCommandScript(String scriptName, String msg, 
-    		String uin, IcqProtocol prot, ChatCommandProc proc){
+    		String uin, Protocol prot, ChatCommandProc proc){
 //    	String sn = proc.srv.getName();
     	try{
     		Interpreter bsh = new Interpreter();
@@ -217,7 +217,7 @@ private String sn=""; // Имя сервиса
     	}
     }
     
-    public String startAnekScript(String name, IcqProtocol proc, AnekCommandProc cproc, String uin, String msg){
+    public String startAnekScript(String name, Protocol proc, AnekCommandProc cproc, String uin, String msg){
 //    	String sn = cproc.srv.getName();
     	try {
     		Interpreter bsh = new Interpreter();
@@ -233,7 +233,7 @@ private String sn=""; // Имя сервиса
         return "";
     }
     
-    public String startCommandScript(String name, IcqProtocol proc, AbstractServer srv, String uin, String arg){
+    public String startCommandScript(String name, Protocol proc, AbstractServer srv, String uin, String arg){
 //    	String sn = srv.getName();
     	try{
         	Interpreter bsh = new Interpreter();

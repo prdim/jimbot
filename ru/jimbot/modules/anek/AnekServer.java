@@ -24,7 +24,7 @@ import ru.jimbot.modules.AbstractServer;
 import ru.jimbot.modules.MsgInQueue;
 import ru.jimbot.modules.UINmanager;
 import ru.jimbot.modules.WorkScript;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.MainProps;
 
 /**
@@ -36,6 +36,7 @@ public class AnekServer extends AbstractServer{
     public AnekWork an;
     public MsgInQueue inq;
     private AnekProps props = null;
+    private String[] icq;
     
     /** Creates a new instance of AnekServer */
     public AnekServer(String name) {
@@ -47,21 +48,21 @@ public class AnekServer extends AbstractServer{
         con.server = MainProps.getServer();
         con.port = MainProps.getPort();
         con.proxy = MainProps.getProxy();
-        String[] icq = new String[AnekProps.getInstance(this.getName()).uinCount()];
+        icq = new String[AnekProps.getInstance(this.getName()).uinCount()];
         String[] pass = new String[AnekProps.getInstance(this.getName()).uinCount()];
         for(int i=0;i<AnekProps.getInstance(this.getName()).uinCount();i++){
             icq[i] = AnekProps.getInstance(this.getName()).getUin(i);
             pass[i] = AnekProps.getInstance(this.getName()).getPass(i);
         }
-        con.uins = new UINmanager(icq, pass, con, true, 
+        con.uins = new UINmanager(icq, pass,
                 AnekProps.getInstance(this.getName()));
         inq = new MsgInQueue(cmd);
      }
     
      public void start(){
          con.uins.start();
-         for(int i=0;i<con.uins.count();i++){
-             inq.addReceiver((IcqProtocol)con.uins.proc.get(i));
+         for(Protocol p:con.uins.proc.values()){
+             inq.addReceiver(p);
          }
          inq.start();
          // Удалить из запуска инициализацию базы. Она должна проходить по мере необходимости.
@@ -96,7 +97,9 @@ public class AnekServer extends AbstractServer{
     	 return inq.size();
      }
      
-     public IcqProtocol getIcqProcess(int baseUin) {
-    	 return con.uins.proc.get(baseUin);
-     }
+     public Protocol getIcqProcess(int baseUin) {
+        if(con.uins.proc.get(icq[baseUin])!=null)
+            return con.uins.proc.get(icq[baseUin]);
+        return con.uins.proc.get(icq[0]);
+    }
 }

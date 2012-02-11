@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ru.jimbot.modules.WorkScript;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 
 /**
@@ -65,7 +65,7 @@ public class RobAdmin implements Runnable {
     /**
      * Добавление в очередь нового задания
      */
-    public void parse(IcqProtocol proc, String uin, String msg, int room){
+    public void parse(Protocol proc, String uin, String msg, int room){
         cTime = System.currentTimeMillis();
         mq.add(new MsgElement(msg,uin,proc,room));
     }

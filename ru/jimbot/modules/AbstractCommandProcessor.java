@@ -21,7 +21,7 @@ package ru.jimbot.modules;
 import java.util.Vector;
 
 import ru.jimbot.modules.chat.Users;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 
 /**
  *
@@ -37,13 +37,13 @@ public class AbstractCommandProcessor {
     
     public AbstractServer getServer(){return null;}
     
-    public void parse(IcqProtocol proc, String uin, String msg) {}
+    public void parse(Protocol proc, String uin, String msg) {}
     
-    public void parseStatus(IcqProtocol proc, String uin, int status) {}
+    public void parseStatus(Protocol proc, String uin, int status) {}
     
     public void testState(int uin) {}
     
     public void parseInfo(Users u, int type){}
     
-    public void parseFloodNotice(String uin, String msg, IcqProtocol proc) {};
+    public void parseFloodNotice(String uin, String msg, Protocol proc) {};
 }

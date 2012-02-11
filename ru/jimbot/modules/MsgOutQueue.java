@@ -20,7 +20,7 @@ package ru.jimbot.modules;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 import ru.jimbot.util.MainProps;
 
@@ -31,7 +31,7 @@ import ru.jimbot.util.MainProps;
 public class MsgOutQueue implements Runnable {
     int counter=0;
     int maxCounter=144; //Период переподключения
-    public IcqProtocol proc;
+    public Protocol proc;
     private Thread th;
     int sleepAmount = 5000;
     ConcurrentLinkedQueue <Msg> q;
@@ -42,7 +42,7 @@ public class MsgOutQueue implements Runnable {
     private long t = 0; // Время последнего отправленного сообщения
     
     /** Creates a new instance of MsgOutQueue */
-    public MsgOutQueue(IcqProtocol pr, int pout, int prestart, int mlimit) {
+    public MsgOutQueue(Protocol pr, int pout, int prestart, int mlimit) {
         PAUSE_OUT = pout; PAUSE_RESTART=prestart; MSG_OUT_LIMIT=mlimit;
         sleepAmount = PAUSE_OUT; //Props.getIntProperty("bot.pauseOut");
         proc = pr;
@@ -102,10 +102,10 @@ public class MsgOutQueue implements Runnable {
             m = q.poll();
             switch (m.type){
             case Msg.TYPE_INFO:
-            	proc.userInfoRequest(m.uin, m.text);
+//            	proc.userInfoRequest(m.uin, m.text);
             	break;
             case Msg.TYPE_AUTH:
-            	proc.authRequest(m.uin, m.text);
+//            	proc.authRequest(m.uin, m.text);
             	break;
             case Msg.TYPE_MSG:
             default:

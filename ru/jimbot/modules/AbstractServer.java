@@ -21,7 +21,7 @@ package ru.jimbot.modules;
 import java.util.Vector;
 
 import ru.jimbot.db.DBAdaptor;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 /**
  *
  * @author Prolubnikov Dmitry
@@ -41,15 +41,15 @@ public class AbstractServer {
     
     public void stop() {}
     
-    public void parseMsg(IcqProtocol proc, String uin, String msg) {
+    public void parseMsg(Protocol proc, String uin, String msg) {
         cmd.parse(proc, uin, msg);
     }
     
-    public void parseStatus(IcqProtocol proc, String uin, int status) {
+    public void parseStatus(Protocol proc, String uin, int status) {
         cmd.parseStatus(proc, uin, status);
     }
     
-    public IcqProtocol getIcqProcess(int baseUin) {
+    public Protocol getIcqProcess(int baseUin) {
         return null;
     }
     

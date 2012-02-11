@@ -37,7 +37,7 @@ import ru.jimbot.modules.CommandExtend;
 import ru.jimbot.modules.CommandParser;
 import ru.jimbot.modules.FloodElement;
 import ru.jimbot.modules.WorkScript;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 import ru.jimbot.util.MainProps;
 
@@ -224,7 +224,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * Проверка на первое сообщение. Выдает админам извещение о запуске чата.
      * @param proc
      */
-    private void firstMsg(IcqProtocol proc){
+    private void firstMsg(Protocol proc){
     	if(!firstStartMsg){
     		String[] s = srv.getProps().getAdmins();
     		for(int i=0;i<s.length;i++){
@@ -246,7 +246,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * Основная процедура парсера команд
      */
-    public void parse(IcqProtocol proc, String uin, String mmsg) {
+    public void parse(Protocol proc, String uin, String mmsg) {
     	if(radm==null){
     		radm = new RobAdmin(srv);
     		radm.start();
@@ -341,7 +341,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
             }
             testFlood(proc,uin);
             mmsg = WorkScript.getInstance(srv.getName()).startMessagesScript(mmsg, srv);
-            if(mmsg.equals("")) return; // Сообщение было удалено в скрипте
+            if(mmsg.isEmpty()) return; // Сообщение было удалено в скрипте
             int tp = 0;
             if(comMap.containsKey(uin) && srv.getProps().getBooleanProperty("chat.useCaptcha"))
             	if(!comMap.get(uin).isExpire())
@@ -495,7 +495,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
                 break;
             case 39: // Обработка команды макросом
             	String ret = WorkScript.getInstance(srv.getName()).startChatCommandScript(parser.parseCommand2(tmsg).script, tmsg, uin, proc, this);
-            	if(!ret.equals("") && !ret.equals("ok")) proc.mq.add(uin,Messages.getString("ChatCommandProc.parse.2"));
+            	if(!ret.isEmpty() && !ret.equals("ok")) proc.mq.add(uin,Messages.getString("ChatCommandProc.parse.2"));
             	break;
             case 40:
             	commandLRoom(proc,uin);
@@ -560,7 +560,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * !help
      */
-    public void commandHelp(IcqProtocol proc, String uin){
+    public void commandHelp(Protocol proc, String uin){
         String[] s = psp.getHelp1().split("<br>");
         for(int i=0;i<s.length;i++){
             proc.mq.add(uin,s[i]);
@@ -578,7 +578,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void commandGofree(IcqProtocol proc, String uin){
+    public void commandGofree(Protocol proc, String uin){
         try{
             String s = srv.us.getFreeUin();
             changeBaseUin(uin,s);
@@ -597,7 +597,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandGo(IcqProtocol proc, String uin, Vector v){
+    public void commandGo(Protocol proc, String uin, Vector v){
         try{
             int k = (Integer)v.get(0);
             if(k>=psp.uinCount() || k<0){
@@ -619,7 +619,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void commandInvite(IcqProtocol proc, String uin){
+    public void commandInvite(Protocol proc, String uin){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(psp.getBooleanProperty("chat.FreeReg")){
 //            proc.mq.add(uin,"Чат открыт для свободного входа, приглашения создавать не нужно.");
@@ -628,7 +628,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
         }
         if(!auth(proc,uin, "invite")) return;
         String s = srv.us.createInvite(srv.us.getUser(uin).id);
-        if(s.equals("")) {
+        if(s.isEmpty()) {
 //            proc.mq.add(uin,"Не удалось создать новое приглашение, возможно вы не использовали еще старое приглашение.");
             proc.mq.add(uin, Messages.getString("ChatCommandProc.commandInvite.1"));
         } else {
@@ -644,7 +644,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandInfo(IcqProtocol proc, String uin, Vector v){
+    public void commandInfo(Protocol proc, String uin, Vector v){
         if(!auth(proc,uin, "info")) return;
         try {
             String s = (String)v.get(0);
@@ -670,7 +670,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandKick(IcqProtocol proc, String uin, Vector v){
+    public void commandKick(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "kickone")) return;
         try{
@@ -701,7 +701,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
 //                    proc.mq.add(uin,"Юзер выпнут на: " + testKick(i));
                     proc.mq.add(uin, Messages.getString("ChatCommandProc.commandKick.1", new Object[] {testKick(i)}));
                 } else {
-                    if(r.equals("")){
+                    if(r.isEmpty()){
 //                        proc.mq.add(uin,"Необходимо добавить причину кика");
                         proc.mq.add(uin, Messages.getString("ChatCommandProc.commandKick.2"));
                         return;
@@ -725,7 +725,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandWho(IcqProtocol proc, String uin, Vector v){
+    public void commandWho(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "whouser")) return;
         try{
@@ -743,7 +743,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandCheckuser(IcqProtocol proc, String uin, Vector v){
+    public void commandCheckuser(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "authread")) return;
         try{
@@ -761,7 +761,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandSetgroup(IcqProtocol proc, String uin, Vector v){
+    public void commandSetgroup(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "authwrite")) return;
         try{
@@ -799,7 +799,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandGrant(IcqProtocol proc, String uin, Vector v){
+    public void commandGrant(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "authwrite")) return;
         try{
@@ -832,7 +832,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandRevoke(IcqProtocol proc, String uin, Vector v){
+    public void commandRevoke(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "authwrite")) return;
         try{
@@ -865,7 +865,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandBan(IcqProtocol proc, String uin, Vector v){
+    public void commandBan(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "ban")) return;
         try{
@@ -878,7 +878,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
                     proc.mq.add(uin, Messages.getString("ChatCommandProc.commandBan.0"));
                     return;
                 }
-                if(m.equals("")){
+                if(m.isEmpty()){
 //                    proc.mq.add(uin,"Необходимо добавить причину бана");
                     proc.mq.add(uin, Messages.getString("ChatCommandProc.commandBan.1"));
                     return;
@@ -894,13 +894,13 @@ public class ChatCommandProc extends AbstractCommandProcessor {
                     return;
                 }
                 i = srv.us.getUser(id).sn;
-                if(!i.equals("")) {
+                if(!i.isEmpty()) {
                     if(uin.equals(i)){
 //                        proc.mq.add(uin,"Нельзя отправить в баню самого себя :)");
                         proc.mq.add(uin, Messages.getString("ChatCommandProc.commandBan.0"));
                         return;
                     }   
-                    if(m.equals("")){
+                    if(m.isEmpty()){
 //                        proc.mq.add(uin,"Необходимо добавить причину бана");
                         proc.mq.add(uin, Messages.getString("ChatCommandProc.commandBan.1"));
                         return;
@@ -922,7 +922,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandUban(IcqProtocol proc, String uin, Vector v){
+    public void commandUban(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "ban")) return;
         try{
@@ -939,7 +939,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
                     proc.mq.add(uin, Messages.getString("ChatCommandProc.err.1"));
                 }
                 i = srv.us.getUser(id).sn;
-                if(!i.equals("")) uban(proc, i, uin);
+                if(!i.isEmpty()) uban(proc, i, uin);
 //                proc.mq.add(uin,"Пользователь " + i + " был выпущен из бани");
                 proc.mq.add(uin, Messages.getString("ChatCommandProc.commandUban.0", new Object[]{i}));
             }            
@@ -956,7 +956,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param v
      * @param mmsg
      */
-    public void commandReg(IcqProtocol proc, String uin, Vector v, String mmsg){
+    public void commandReg(Protocol proc, String uin, Vector v, String mmsg){
         try{
         	boolean twoPart = false; // Второй заход в процедуру после ответа?
         	if(srv.getProps().getBooleanProperty("chat.useCaptcha") && comMap.containsKey(uin)){
@@ -974,7 +974,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
             int maxNick = psp.getIntProperty("chat.maxNickLenght");
             String lnick = (String)v.get(0);
             Users uss = srv.us.getUser(uin);
-            if (lnick.equals("") || lnick.equals(" ")){
+            if (lnick.isEmpty() || lnick.equals(" ")){
 //                proc.mq.add(uin,"ошибка регистрации, пустой ник");
                 proc.mq.add(uin, Messages.getString("ChatCommandProc.commandReg.1"));
                 Log.talk(uin + " Reg error: " + mmsg);
@@ -1057,7 +1057,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
             }
             // Регистрация по приглашению
             String inv = (String)v.get(1);
-            if(inv.equals("")){
+            if(inv.isEmpty()){
                 Log.talk(uin + " Reg error: " + mmsg);
                 proc.mq.add(uin,Messages.getString("ChatCommandProc.commandReg.12") + "\n" +
                 		psp.getStringProperty("chat.inviteDescription"));
@@ -1107,7 +1107,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void commandA(IcqProtocol proc, String uin){
+    public void commandA(Protocol proc, String uin){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         int room = srv.us.getUser(uin).room;
 //        String s = "Комната: " +room + " - " + srv.us.getRoom(room).getName() +
@@ -1138,7 +1138,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void commandAA(IcqProtocol proc, String uin){
+    public void commandAA(Protocol proc, String uin){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         int room = srv.us.getUser(uin).room;
 //        String s = "Список пользователей в чате\n";
@@ -1161,13 +1161,13 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param v
      * @param tmsg
      */
-    public void commandP(IcqProtocol proc, String uin, Vector v, String tmsg){
+    public void commandP(Protocol proc, String uin, Vector v, String tmsg){
         if(!isChat(proc,uin)) return;
         if(!auth(proc,uin, "pmsg")) return;
         try{
             int no = (Integer)v.get(0);
             String txt = (String)v.get(1);
-            if(txt.equals("")) {
+            if(txt.isEmpty()) {
 //                proc.mq.add(uin,"Сообщение отсутствует");
                 proc.mq.add(uin,Messages.getString("ChatCommandProc.commandP.0"));
                 return;
@@ -1210,18 +1210,18 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param v
      * @param tmsg
      */
-    public void commandPP(IcqProtocol proc, String uin, Vector v, String tmsg){
+    public void commandPP(Protocol proc, String uin, Vector v, String tmsg){
         if(!isChat(proc,uin)) return;
         if(!auth(proc,uin, "pmsg")) return;
         try{
             String txt = (String)v.get(0);
             String fsn = testPM(uin);
-            if(txt.equals("")) {
+            if(txt.isEmpty()) {
 //                proc.mq.add(uin,"Сообщение отсутствует");
                 proc.mq.add(uin,Messages.getString("ChatCommandProc.commandP.0"));
                 return;
             }
-            if(fsn.equals("")) {
+            if(fsn.isEmpty()) {
 //                proc.mq.add(uin,"Не найдено входящих сообщений, отправлять некому");
                 proc.mq.add(uin,Messages.getString("ChatCommandProc.commandPP.0"));
                 return;
@@ -1263,7 +1263,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandSettheme(IcqProtocol proc, String uin, Vector v){
+    public void commandSettheme(Protocol proc, String uin, Vector v){
         if(!auth(proc,uin, "settheme")) return;
         String s = (String)v.get(0);
         int room = srv.us.getUser(uin).room;
@@ -1282,7 +1282,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandGetinfo(IcqProtocol proc, String uin, Vector v){
+    public void commandGetinfo(Protocol proc, String uin, Vector v){
         if(!isAdmin(proc, uin)) return;
         try{
             String s = (String)v.get(0);
@@ -1301,7 +1301,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandRoom(IcqProtocol proc, String uin, Vector v){
+    public void commandRoom(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin)) return;
         if(!auth(proc,uin, "room")) return;
         try{
@@ -1317,7 +1317,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
                 srv.cq.changeUserRoom(uin, i);
                 srv.cq.addMsg(Messages.getString("ChatCommandProc.commandRoom.2", new Object[] {uss.localnick, uss.room}), uin, uss.room);
                 proc.mq.add(uin,Messages.getString("ChatCommandProc.commandRoom.3") + i + " - " + srv.us.getRoom(i).getName() +
-                        (srv.us.getRoom(i).getTopic().equals("") ? "" : ("\n" + Messages.getString("ChatCommandProc.commandRoom.4") + srv.us.getRoom(i).getTopic())));
+                        (srv.us.getRoom(i).getTopic().isEmpty() ? "" : ("\n" + Messages.getString("ChatCommandProc.commandRoom.4") + srv.us.getRoom(i).getTopic())));
             } else {
 //                proc.mq.add(uin,"Такой комнаты не существует! Некуда переходить.");
                 proc.mq.add(uin,Messages.getString("ChatCommandProc.commandRoom.5"));
@@ -1334,7 +1334,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandWhoinvite(IcqProtocol proc, String uin, Vector v) {
+    public void commandWhoinvite(Protocol proc, String uin, Vector v) {
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "whoinv")) return;
         try {
@@ -1351,7 +1351,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void commandKickhist(IcqProtocol proc, String uin) {
+    public void commandKickhist(Protocol proc, String uin) {
         if(!auth(proc,uin, "kickhist")) return;
         try {
             proc.mq.add(uin,srv.us.getKickHist());
@@ -1367,7 +1367,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandAdm(IcqProtocol proc, String uin, Vector v) {
+    public void commandAdm(Protocol proc, String uin, Vector v) {
         try {
             OutputStreamWriter ow = new OutputStreamWriter(new FileOutputStream("./admin_msg.txt",true),"windows-1251");
             String s = "[" + new Timestamp(System.currentTimeMillis()) + "] " + uin + 
@@ -1391,7 +1391,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void commandBanhist(IcqProtocol proc, String uin) {
+    public void commandBanhist(Protocol proc, String uin) {
         if(!auth(proc,uin, "ban")) return;
         try {
             proc.mq.add(uin,srv.us.getBanHist());
@@ -1406,7 +1406,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void commandLRoom(IcqProtocol proc, String uin) {
+    public void commandLRoom(Protocol proc, String uin) {
     	if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
     	String s = Messages.getString("ChatCommandProc.commandLRoom.0") + "\n";
     	Set<Integer> rid = srv.us.getRooms();
@@ -1422,7 +1422,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandCrRoom(IcqProtocol proc, String uin, Vector v){
+    public void commandCrRoom(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "wroom")) return;
         int room = (Integer)v.get(0);
@@ -1446,7 +1446,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @param v
      */
-    public void commandChRoom(IcqProtocol proc, String uin, Vector v){
+    public void commandChRoom(Protocol proc, String uin, Vector v){
         if(!isChat(proc,uin) && !psp.testAdmin(uin)) return;
         if(!auth(proc,uin, "wroom")) return;
         int room = (Integer)v.get(0);
@@ -1466,7 +1466,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * Отправка сообщений забаненым и кикнутым юзерам происходит изредка
      */
-    private void infrequentSend(IcqProtocol proc, String uin, String msg){
+    private void infrequentSend(Protocol proc, String uin, String msg){
         if(radm.testRnd(20))
             proc.mq.add(uin, msg);
     }
@@ -1508,7 +1508,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
         }
         String s = psp.getStringProperty("chat.badSymNicks");
         String s1 = psp.getStringProperty("chat.goodSymNicks");
-        if(s1.equals("")){
+        if(s1.isEmpty()){
         	for(int i=0;i<s.length();i++){
         		if(nick.indexOf(s.charAt(i))>=0) return false;
             }
@@ -1613,7 +1613,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * Парсер сообщений о смене статусов
      */
-    public void parseStatus(IcqProtocol proc, String uin, int status) {
+    public void parseStatus(Protocol proc, String uin, int status) {
         try{
         } catch (Exception ex) {}
         if(!srv.us.testUser(uin)) return; //Если в КЛ занесены посторонние юзеры
@@ -1674,7 +1674,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @return
      */
-    public boolean isAdmin(IcqProtocol proc, String uin){
+    public boolean isAdmin(Protocol proc, String uin){
         if(!psp.testAdmin(uin)){
 //            proc.mq.add(uin,"Вы не имеете доступа к данной команде.");
             proc.mq.add(uin,Messages.getString("ChatCommandProc.auth.0"));
@@ -1690,7 +1690,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param obj
      * @return
      */
-    public boolean auth(IcqProtocol proc, String uin, String obj){
+    public boolean auth(Protocol proc, String uin, String obj){
         if(!srv.us.authorityCheck(uin, obj)){
 //            proc.mq.add(uin,"Вы не имеете доступа к данной команде."); 
             proc.mq.add(uin,Messages.getString("ChatCommandProc.auth.0"));
@@ -1706,7 +1706,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param obj
      * @return
      */
-    public boolean qauth(IcqProtocol proc, String uin, String obj){
+    public boolean qauth(Protocol proc, String uin, String obj){
         if(!srv.us.authorityCheck(uin, obj)){
             return false;
         }
@@ -1719,10 +1719,10 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void goChat(IcqProtocol proc, String uin) {
+    public void goChat(Protocol proc, String uin) {
         Users uss = srv.us.getUser(uin);
         boolean f = false;
-        if(uss.localnick==null || uss.localnick.equals("") || uss.state==UserWork.STATE_NO_REG) {
+        if(uss.localnick==null || uss.localnick.isEmpty() || uss.state==UserWork.STATE_NO_REG) {
 //            proc.mq.add(uin, "Прежде чем войти в чат, необходимо зарегистрироваться.");
             proc.mq.add(uin,Messages.getString("ChatCommandProc.goChat.0"));
             return;
@@ -1768,7 +1768,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param proc
      * @param uin
      */
-    public void exitChat(IcqProtocol proc, String uin) {
+    public void exitChat(Protocol proc, String uin) {
         Users uss = srv.us.getUser(uin);
         if (uss.state==UserWork.STATE_CHAT ||
                 uss.state==UserWork.STATE_OFFLINE) {
@@ -1805,7 +1805,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
      * @param uin
      * @return истина, если юзер выпнут за флуд
      */
-    private boolean testFlood(IcqProtocol proc, String uin){
+    private boolean testFlood(Protocol proc, String uin){
     	if(warnFlag.contains(uin)) warnFlag.remove(uin);
     	if(floodMap.containsKey(uin)){
     		if(floodMap.get(uin).getCount()>psp.getIntProperty("chat.floodCountLimit")){
@@ -1825,7 +1825,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * КИК с записью в лог
      */
-    public void lkick(IcqProtocol proc, String uin, String txt, int id) {
+    public void lkick(Protocol proc, String uin, String txt, int id) {
         kick(proc, uin);
         srv.us.db.log(srv.us.getUser(uin).id,uin,"KICK", txt,srv.us.getUser(uin).room);
         srv.us.db.event(srv.us.getUser(uin).id, uin, "KICK", id, "", txt);
@@ -1834,7 +1834,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * КИК с автоматическим определением времени
      */
-    public void akick(IcqProtocol proc, String uin, int user_id){
+    public void akick(Protocol proc, String uin, int user_id){
         int def = psp.getIntProperty("chat.defaultKickTime");
         int max = psp.getIntProperty("chat.maxKickTime");
         int i=def;
@@ -1846,14 +1846,14 @@ public class ChatCommandProc extends AbstractCommandProcessor {
         tkick(proc, uin, i, user_id, "");
     }
     
-    public void akick(IcqProtocol proc, String uin){
+    public void akick(Protocol proc, String uin){
         akick(proc, uin, 0);
     }
     
     /**
      * КИК с выставлением времени
      */
-    public void tkick(IcqProtocol proc, String uin, int t, int user_id, String r){
+    public void tkick(Protocol proc, String uin, int t, int user_id, String r){
         setKick(uin,t, user_id, r);
         Log.talk("kick user " + uin + " on " + t + " min.");
         if (srv.us.getUser(uin).state == UserWork.STATE_CHAT)
@@ -1865,18 +1865,18 @@ public class ChatCommandProc extends AbstractCommandProcessor {
 //                                : srv.us.getUser(user_id).localnick)
 //                        + (r.equals("") ? "" : (", Причина: " + r)));
                 proc.mq.add(uin, Messages.getString("ChatCommandProc.tkick.0", new Object[] {t, (user_id == 0 ? radm.NICK : srv.us.getUser(user_id).localnick)}) +
-                        (r.equals("") ? "" : (Messages.getString("ChatCommandProc.tkick.1") + r)));
+                        (r.isEmpty() ? "" : (Messages.getString("ChatCommandProc.tkick.1") + r)));
             } else {
                 proc.mq.add(uin, Messages.getString("ChatCommandProc.tkick.2", new Object[] {t}));
             }
         lkick(proc, uin, "kick user on " + t + " min. - " + r, user_id);
     }
     
-    public void tkick(IcqProtocol proc, String uin, int t){
+    public void tkick(Protocol proc, String uin, int t){
         tkick(proc, uin, t, 0, "");
     }
     
-    public void kick(IcqProtocol proc, String uin) {
+    public void kick(Protocol proc, String uin) {
         Users uss = srv.us.getUser(uin);
         if(uss.state != UserWork.STATE_CHAT) return;
         Log.talk("Kick user " + uin);
@@ -1888,7 +1888,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
         exitChat(proc, uin);
     }
     
-    public void kickAll(IcqProtocol proc, String uin) {
+    public void kickAll(Protocol proc, String uin) {
         Vector v = srv.us.getUsers(UserWork.STATE_CHAT);
         for(int i=0;i<v.size();i++){
             Users uss = (Users)v.get(i);
@@ -1901,7 +1901,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
         }
     }
     
-    public void ban(IcqProtocol proc, String uin, String adm_uin, String m) {
+    public void ban(Protocol proc, String uin, String adm_uin, String m) {
         Users uss = srv.us.getUser(uin);
         if(uss.state==UserWork.STATE_CHAT) kick(proc, uin);
         Log.talk("Ban user " + uin);
@@ -1918,7 +1918,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
                 (psp.getBooleanProperty("chat.isShowKickReason") ? ("\n" + Messages.getString("ChatCommandProc.ban.1") + m) : ""));
     }
     
-    public void uban(IcqProtocol proc, String uin, String adm_uin) {
+    public void uban(Protocol proc, String uin, String adm_uin) {
         Users uss = srv.us.getUser(uin);
         if(uss.state!=UserWork.STATE_BANNED) return;
         srv.us.db.log(uss.id,uin,"UBAN","",uss.room);
@@ -1930,7 +1930,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * Временный выход из чата (пользователь оффлайн)
      */
-    public void tempExitChat(IcqProtocol proc, String uin) {
+    public void tempExitChat(Protocol proc, String uin) {
         Users uss = srv.us.getUser(uin);
         uss.state=UserWork.STATE_OFFLINE;
         Log.talk(uss.localnick + " временно ушел из чата");
@@ -1943,13 +1943,13 @@ public class ChatCommandProc extends AbstractCommandProcessor {
         srv.cq.delUser(uin);
     }
     
-    public void addUser(String uin, IcqProtocol proc){
+    public void addUser(String uin, Protocol proc){
         if(!srv.us.testUser(uin)){
             srv.us.reqUserInfo(uin,proc);
         }
     }
     
-    public boolean isChat(IcqProtocol proc,String uin) {
+    public boolean isChat(Protocol proc,String uin) {
         try{
             if(srv.us.getUser(uin).state==UserWork.STATE_CHAT){
                 return true;
@@ -1974,7 +1974,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     /**
      * Обработка сообщений о флуде - слишком частые сообщения должны быть блокированы
      */
-    public void parseFloodNotice(String uin, String msg, IcqProtocol proc){
+    public void parseFloodNotice(String uin, String msg, Protocol proc){
     	if(isBan(uin)) return;
         if(testKick(uin)>0) return;
         if(!srv.us.testUser(uin)) return; // Юзер не зареган

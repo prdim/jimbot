@@ -23,7 +23,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ru.jimbot.modules.chat.Users;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 
 /**
@@ -131,11 +131,11 @@ public class MsgInQueue implements Runnable {
         th=null;
     }
     
-    public void addReceiver(IcqProtocol ip){
+    public void addReceiver(Protocol ip){
         receivers.add(new MsgReceiver(this,ip));
     }
     
-    public void addMsg(IcqProtocol proc, String sn, String msg, boolean isOffline){
+    public void addMsg(Protocol proc, String sn, String msg, boolean isOffline){
         if(isOffline && ignoreOffline) {
             Log.info("OFFLINE: " + sn + " - " + msg);
             return;
@@ -152,7 +152,7 @@ public class MsgInQueue implements Runnable {
         	
     }
     
-    public void addStatus(IcqProtocol proc, String sn, String st){
+    public void addStatus(Protocol proc, String sn, String st){
 //        Log.info("ADD status in queue");
         MsgQueueElement m = new MsgQueueElement(sn, st, proc);
         m.type = MsgQueueElement.TYPE_STATUS;

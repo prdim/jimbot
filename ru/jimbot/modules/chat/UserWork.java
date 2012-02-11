@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 import ru.jimbot.Messages;
 
@@ -660,7 +660,7 @@ public class UserWork {
 //        db.commit();
     }
     
-    public void reqUserInfo(String uin, IcqProtocol proc) {
+    public void reqUserInfo(String uin, Protocol proc) {
         Users u = new Users();
         u.sn = uin;
         addUser(u);

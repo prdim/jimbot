@@ -25,7 +25,7 @@ import ru.jimbot.modules.AbstractServer;
 import ru.jimbot.modules.MsgInQueue;
 import ru.jimbot.modules.UINmanager;
 import ru.jimbot.modules.WorkScript;
-import ru.jimbot.protocol.IcqProtocol;
+import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.MainProps;
 
 
@@ -38,6 +38,7 @@ public class ChatServer extends AbstractServer{
     public UserWork us;
     public ChatQueue cq;
     public MsgInQueue inq;
+    private String[] icq;
     private ChatProps props = null;
     
     /** Creates a new instance of ChatServer */
@@ -51,14 +52,13 @@ public class ChatServer extends AbstractServer{
         con.server = MainProps.getServer();
         con.port = MainProps.getPort();
         con.proxy = MainProps.getProxy();
-        String[] icq = new String[ChatProps.getInstance(this.getName()).uinCount()];
+        icq = new String[ChatProps.getInstance(this.getName()).uinCount()];
         String[] pass = new String[ChatProps.getInstance(this.getName()).uinCount()];
         for(int i=0;i<ChatProps.getInstance(this.getName()).uinCount();i++){
             icq[i] = ChatProps.getInstance(this.getName()).getUin(i);
             pass[i] = ChatProps.getInstance(this.getName()).getPass(i);
         }
-        con.uins = new UINmanager(icq, pass, con, 
-                ChatProps.getInstance(this.getName()).getBooleanProperty("chat.IgnoreOfflineMsg"), 
+        con.uins = new UINmanager(icq, pass,  
                 ChatProps.getInstance(this.getName()));
         cq = new ChatQueue(this);
         cq.start();
@@ -68,11 +68,9 @@ public class ChatServer extends AbstractServer{
     public void start() {
         us = new UserWork(getName());
     	WorkScript.getInstance(getName()).startScript("start", "", this);
-        if(!con.server.equals("")) {
             con.uins.start();
-        }
-         for(int i=0;i<con.uins.count();i++){
-             inq.addReceiver((IcqProtocol)con.uins.proc.get(i));
+         for(Protocol p: con.uins.proc.values()){
+             inq.addReceiver(p);
          }
         inq.start();
         isRun = true;
@@ -81,7 +79,7 @@ public class ChatServer extends AbstractServer{
     public void stop() {
     	WorkScript.getInstance(getName()).startScript("stop", "", this);
         closeDB();
-        if(!con.server.equals("")) con.uins.stop();
+         con.uins.stop();
         isRun = false;
     }
     
@@ -89,14 +87,10 @@ public class ChatServer extends AbstractServer{
         us.closeDB();
     }
     
-    public IcqProtocol getIcqProcess(String baseUin) {
-        if(!con.server.equals("")) {
-            for(int i=0; i<con.uins.count();i++){
-                if(con.uins.getUin(i).equalsIgnoreCase(baseUin)) 
-                    return (IcqProtocol)con.uins.proc.get(i);
-            }
-        }
-        return null;
+    public Protocol getIcqProcess(String baseUin) {
+        if(con.uins.proc.get(baseUin)!=null)
+            return con.uins.proc.get(baseUin);
+        return con.uins.proc.get(icq[0]);
     }
     
     public DBAdaptor getDB(){
@@ -109,8 +103,10 @@ public class ChatServer extends AbstractServer{
     	return props;
     }
     
-    public IcqProtocol getIcqProcess(int baseUin) {
-   	 return con.uins.proc.get(baseUin);
+    public Protocol getIcqProcess(int baseUin) {
+        if(con.uins.proc.get(icq[baseUin])!=null)
+            return con.uins.proc.get(icq[baseUin]);
+        return con.uins.proc.get(icq[0]);
     }
     
     public int getIneqSize(){
