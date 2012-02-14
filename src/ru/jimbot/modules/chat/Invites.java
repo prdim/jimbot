@@ -21,13 +21,11 @@ package ru.jimbot.modules.chat;
 import java.sql.Types;
 import java.util.Random;
 
-import ru.jimbot.db.DBObject;
-
 /**
  *
  * @author Prolubnikov Dmitry
  */
-public class Invites extends DBObject {
+public final class Invites {
     public int id = 0;
     public int user_id=0;
     public long time=0;
@@ -37,7 +35,6 @@ public class Invites extends DBObject {
     
     /** Creates a new instance of Invites */
     public Invites() {
-        init();
     }
     
         public Invites(int _id,
@@ -63,13 +60,6 @@ public class Invites extends DBObject {
         new_user=0;
         create_time=0;
     }
-
-    private void init(){
-        fields = new String[] {"id","user_id", "time", "invite", "new_user", "create_time"};
-        types = new int[] {Types.INTEGER, Types.INTEGER, Types.TIMESTAMP, Types.VARCHAR,
-            Types.INTEGER, Types.TIMESTAMP};
-        tableName="invites";        
-    }
         
     public boolean checkPrompt(String p){
         return p.equalsIgnoreCase(invite);
@@ -88,17 +78,5 @@ public class Invites extends DBObject {
             v += s.charAt(r.nextInt(s.length()));
         }
         return v;
-    }
-    
-    public String[] getFields(){
-        return fields;
-    }
-    
-    public int[] getTypes(){
-        return types;
-    }
-    
-    public String getTableName(){
-        return this.tableName;
     }
 }

@@ -454,7 +454,9 @@ public class MainPage extends HttpServlet {
 				Manager.getInstance().getService(ns).getProps().getUin(i)+ "\"> : " +
 				"<INPUT TYPE=text NAME=\"pass_" + i + "\" VALUE=\"" + 
 //				Manager.getInstance().getService(ns).getProps().getPass(i)+
-				"\"> " +
+				"\"> : " +
+                        "<INPUT TYPE=text NAME=\"lenght_" + i + "\" VALUE=\"" +
+				Manager.getInstance().getService(ns).getProps().getIntProperty("conn.MaxOutMsgSize"+i)+ "\"> " +
 				"<A HREF=\"" + con.getURI() + "?uid=" + uid + "&page=srvs_props_uin_del&ns="+ns+"&cnt=" + i + "\">" +
 				"Удалить</A><br>";
         }
@@ -484,7 +486,7 @@ public class MainPage extends HttpServlet {
     	}
     	for(int i=0;i<Manager.getInstance().getService(ns).getProps().uinCount();i++){
     		if(!con.get("pass_"+i).isEmpty())
-    			Manager.getInstance().getService(ns).getProps().setUin(i, con.get("uin_"+i), con.get("pass_"+i));
+    			Manager.getInstance().getService(ns).getProps().setUin(i, con.get("uin_"+i), con.get("pass_"+i),Integer.parseInt(con.get("lenght_"+i)));
     	}
     	Manager.getInstance().getService(ns).getProps().save();
     	printOkMsg(con,"main_page");
@@ -506,7 +508,7 @@ public class MainPage extends HttpServlet {
     		SrvUtil.error(con,"Отсутствует сервис с таким именем!");
     		return;
     	}
-    	Manager.getInstance().getService(ns).getProps().addUin("111", "pass");
+    	Manager.getInstance().getService(ns).getProps().addUin("111", "pass", 300);
     	srvs_props_uin(con);
     }
     

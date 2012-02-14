@@ -85,7 +85,7 @@ public class AnekWork {
      * Читает ключи к активным рекламным объявлениям
      */
     private void readAdsKey(){
-    	adsKey = new Vector<Integer>();
+    	adsKey = new Vector<Integer>(getInt("select count(*) from ads where enable=1"));
     	Statement stm = null;
     	ResultSet rs = null;
     	try {
@@ -170,7 +170,7 @@ public class AnekWork {
     	if(!AnekProps.getInstance(serviceName).getBooleanProperty("bot.useAds"))
     		return "";
     	String s = getAds(adsKey.get(r.nextInt(adsKey.size())));
-    	if(s.equals(""))
+    	if(s.isEmpty())
     		return "";
     	else
     		return "\n***\n" + s;
@@ -224,7 +224,7 @@ public class AnekWork {
         int i = (int)db.getLastIndex("aneks");
         Aneks a = new Aneks(i,s);
         db.insertObject(a);
-        maxAnek=(int)i;
+        maxAnek=i;
     }
     
     /**
@@ -242,5 +242,25 @@ public class AnekWork {
         } catch (Exception ex){
             ex.printStackTrace();
         }
+    }
+    
+    /**
+     * Sql запроса с возращаемым типом int
+     * @param sql
+     * @return
+     */
+    public int getInt(String sql){
+        int i=1;
+    	try {
+    		Statement stm = db.getDb().createStatement();
+    		ResultSet rs = stm.executeQuery("select id from ads where enable=1");
+    		if(rs.next())
+    			i = rs.getInt(1);
+                rs.close();
+                stm.close();
+    	} catch (Exception ex){
+    		ex.printStackTrace();
+    	}
+        return i;
     }
 }

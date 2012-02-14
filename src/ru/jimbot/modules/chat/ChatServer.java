@@ -46,8 +46,8 @@ public class ChatServer extends AbstractServer{
     public ChatServer(String name) {
     	this.setName(name);
     	ChatProps.getInstance(name).load();
+        us = new UserWork(name);
         cmd = new ChatCommandProc(this);
-//        us = new UserWork(name);
         con = new ChatConnection(this);
         con.server = MainProps.getServer();
         con.port = MainProps.getPort();
@@ -62,11 +62,10 @@ public class ChatServer extends AbstractServer{
                 ChatProps.getInstance(this.getName()));
         cq = new ChatQueue(this);
         cq.start();
-        inq = new MsgInQueue(cmd);
+        inq = new MsgInQueue(cmd,us.statUsersCount());
     }
     
     public void start() {
-        us = new UserWork(getName());
     	WorkScript.getInstance(getName()).startScript("start", "", this);
             con.uins.start();
          for(Protocol p: con.uins.proc.values()){

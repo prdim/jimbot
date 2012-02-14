@@ -55,11 +55,12 @@ public class RobAdmin implements Runnable {
     /** Creates a new instance of RobAdmin */
     public RobAdmin(ChatServer s) {
         srv = s;
-        mq = new ConcurrentLinkedQueue();
-        uins = new ConcurrentHashMap();
+        mq = new ConcurrentLinkedQueue<MsgElement>();
+        int usr=srv.us.statUsersCount();
+        uins = new ConcurrentHashMap<java.lang.String,java.lang.Integer>(usr);
         uins.put("0",0);
-        test1 = new ConcurrentHashMap();
-        test2 = new ConcurrentHashMap();
+        test1 = new ConcurrentHashMap<String,Integer>(usr);
+        test2 = new ConcurrentHashMap<String,Integer>(usr);
     }
     
     /**

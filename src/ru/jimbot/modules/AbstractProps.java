@@ -45,9 +45,9 @@ public interface AbstractProps {
 	public int uinCount();
 	public String getUin(int i);
 	public String getPass(int i);
-	public int addUin(String uin, String pass);
+	public int addUin(String uin, String pass,int lenght);
 	public void delUin(int c);
-	public void setUin(int i, String uin, String pass);
+	public void setUin(int i, String uin, String pass, int lenght);
 	public boolean isAutoStart();
 	public String[] getAdmins();
 }

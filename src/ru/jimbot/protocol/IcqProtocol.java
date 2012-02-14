@@ -66,13 +66,13 @@ public class IcqProtocol
     private OscarConnection con = null;
     private boolean connected = false;
 
-    public IcqProtocol(AbstractProps props) {
+    public IcqProtocol(AbstractProps props, int num) {
 		this.props = props;
 		server = MainProps.getServer();
 		port = MainProps.getPort();
 		mq = new MsgOutQueue(this, props.getIntProperty("bot.pauseOut"),
                 props.getIntProperty("bot.pauseRestart"),
-                props.getIntProperty("bot.msgOutLimit"));
+                props.getIntProperty("bot.msgOutLimit"),num);
 //        mq.start();
 	}
 //
@@ -165,6 +165,7 @@ public class IcqProtocol
 
     @Override
     public void onIncomingMessage(IncomingMessageEvent e) {
+        if(e.getMessage().contains("only receives messages from contacts"))return;
         if (MainProps.isIgnor(e.getSenderID())) {
             Log.flood("IGNORE LIST: " + e.getMessageId() + "->" + screenName + ": " + e.getMessage());
             return;

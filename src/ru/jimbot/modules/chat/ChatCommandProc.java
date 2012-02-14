@@ -62,9 +62,9 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     private ConcurrentHashMap <String, FloodElement> floodMap, floodMap2, floodNoReg;
     private HashMap<String, CommandExtend> comMap;
     // Для хранения доступных объектов авторизации
-    private HashMap<String, String> authObj = new HashMap<String, String>();
+    private HashMap<String, String> authObj = new HashMap<String, String>(22);
     // Для хранения доступных команд
-    private HashMap<String, Cmd> commands = new HashMap<String, Cmd>();
+    private HashMap<String, Cmd> commands = new HashMap<String, Cmd>(50);
     
     class KickInfo {
         public int id=0;
@@ -88,14 +88,15 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     public ChatCommandProc(ChatServer s) {
     	parser = new CommandParser(commands);
         srv = s;
+        int usr= srv.us.statUsersCount();
         psp = ChatProps.getInstance(srv.getName());
-        up = new ConcurrentHashMap<String, String>();
-        statKick = new ConcurrentHashMap<String, KickInfo>();
-        floodMap = new ConcurrentHashMap <String, FloodElement>();
-        floodMap2 = new ConcurrentHashMap <String, FloodElement>();
-        floodNoReg = new ConcurrentHashMap <String, FloodElement>();
-        comMap = new HashMap<String, CommandExtend>();
-        warnFlag = new HashSet<String>();
+        up = new ConcurrentHashMap<String, String>(usr/2);
+        statKick = new ConcurrentHashMap<String, KickInfo>(srv.us.statKickCount()+2);
+        floodMap = new ConcurrentHashMap <String, FloodElement>(usr);
+        floodMap2 = new ConcurrentHashMap <String, FloodElement>(usr);
+        floodNoReg = new ConcurrentHashMap <String, FloodElement>(usr);
+        comMap = new HashMap<String, CommandExtend>(usr/2);
+        warnFlag = new HashSet<String>(usr);
         init();
     }
     
@@ -1752,7 +1753,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
         srv.us.db.event(uss.id, uin, "STATE_IN", 0, "", uss.localnick + " Вошел в чат");
         srv.cq.addUser(uin,proc.baseUin, uss.room);
         if(f){
-            if(srv.us.getCurrUinUsers(uss.basesn)>psp.getIntProperty("chat.maxUserOnUin")){
+            if(srv.us.getCurrUinUsers(uss.basesn)>psp.getIntProperty("chat.maxUserOnUin")&&parser.parseCommand(uin)!=0){
                 proc.mq.add(uin,Messages.getString("ChatCommandProc.goChat.4"));
                 String s = srv.us.getFreeUin();
                 uss.basesn = s;

@@ -56,7 +56,7 @@ public class AnekServer extends AbstractServer{
         }
         con.uins = new UINmanager(icq, pass,
                 AnekProps.getInstance(this.getName()));
-        inq = new MsgInQueue(cmd);
+        inq = new MsgInQueue(cmd,35);
      }
     
      public void start(){

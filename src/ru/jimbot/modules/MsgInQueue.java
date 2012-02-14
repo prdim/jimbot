@@ -38,12 +38,13 @@ public class MsgInQueue implements Runnable {
     int sleepAmount = 100;
     public boolean ignoreOffline = true;
     // Пары уин - время последнего сообщения
-    private HashMap<String,Long> flood = new HashMap<String,Long>();
+    private HashMap<String,Long> flood;
         
     /** Creates a new instance of MsgInQueue */
-    public MsgInQueue(AbstractCommandProcessor c) {
+    public MsgInQueue(AbstractCommandProcessor c,int u) {
         cmd = c;
-        receivers = new Vector<MsgReceiver>();
+        flood = new HashMap<String,Long>(u);
+        receivers = new Vector<MsgReceiver>(c.getServer().getProps().uinCount());
         q = new ConcurrentLinkedQueue<MsgQueueElement>();
     }
     
@@ -101,7 +102,7 @@ public class MsgInQueue implements Runnable {
     
     private void parseMsg(){
         try{
-            if(q.size()==0) return;
+            if(q.isEmpty()) return;
             MsgQueueElement m = q.poll();
             if(m.type==MsgQueueElement.TYPE_TEXT){
                 cmd.parse(m.proc,m.sn,m.msg);

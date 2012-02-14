@@ -18,14 +18,12 @@
 
 package ru.jimbot.modules.chat;
 
-import ru.jimbot.db.DBObject;
-
 /**
 * Комната в чате
 * 
 * @author Prolubnikov Dmitry
 */
-public class Rooms extends DBObject {
+public class Rooms {
 	private int id=0;
 	private String name="";
 	private String topic="";
@@ -83,22 +81,4 @@ public class Rooms extends DBObject {
 		this.pass = pass;
 	}
 
-	@Override
-	public String[] getFields() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public String getTableName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public int[] getTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }

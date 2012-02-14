@@ -20,7 +20,9 @@ package ru.jimbot.modules.chat;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -35,7 +37,7 @@ import ru.jimbot.Messages;
  *
  * @author Prolubnikov Dmitry
  */
-public class UserWork {
+public final class UserWork {
     public static final int STATE_NO_REG = 0;
     public static final int STATE_NO_CHAT = 1;
     public static final int STATE_CHAT = 2;
@@ -67,13 +69,14 @@ public class UserWork {
             db = new DBChat(name);
             db.openConnection(host, this.name, user, pass);
 //            Sms.setDB(db);
-            uc = new ConcurrentHashMap<String,Users>();
-            uu = new ConcurrentHashMap<Integer,String>();
-            auth = new ConcurrentHashMap<Integer,HashSet<String>>();
+            int usr=statUsersCount();
+            uc = new ConcurrentHashMap<String,Users>(usr);
+            uu = new ConcurrentHashMap<Integer,String>(usr);
+            auth = new ConcurrentHashMap<Integer,HashSet<String>>(usr);
 //            ignor = new ArrayList();
             currCountUser=0;
             clearStatusUsers();
-            rw = new RoomWork(db);
+            rw = new RoomWork(db,usr);
             rw.fillCash();
 //            readIgnore();
         } catch (Exception ex){
@@ -127,7 +130,7 @@ public class UserWork {
      * @return
      */
     private Users getUserFromDB(int id){
-    	Vector v = db.getObjectVector("select * from users where id="+id);
+    	Vector<Users> v = db.getObjectVector("select * from users where id="+id);
     	Users u = new Users();
     	if(v.size()>0) u = (Users)v.get(0);
     	if(u.id!=0) u.group = getUserGroup(u.id);
@@ -140,9 +143,9 @@ public class UserWork {
      * @return
      */
     private Users getUserFromDB(String sn){
-    	Vector v = db.getObjectVector("select * from users where sn='"+sn+"'");
+    	Vector<Users> v = db.getObjectVector("select * from users where sn='"+sn+"'");
     	Users u = new Users();
-    	if(v.size()>0) u = (Users)v.get(0);
+    	if(v.size()>0) u = v.get(0);
     	if(u.id!=0) u.group = getUserGroup(u.id);
     	return u;
     }
@@ -590,7 +593,7 @@ public class UserWork {
     public String getBanDesc(String uin) {
         Vector<String[]> v = db.getValues("SELECT user_id2,time, msg FROM `events` " +
                 "where type='BAN' and user_sn='"+uin+"'order by time desc");
-        if(v.size()==0) return "";
+        if(v.isEmpty()) return "";
         return getUser(Integer.parseInt(v.get(0)[0])).localnick+", "+
                 v.get(0)[1]+", "+v.get(0)[2];
     }
@@ -678,16 +681,16 @@ public class UserWork {
     
     public boolean testInvite(String uid){
         db.clearOldInvites(uid);
-        Vector v=db.getValues("select count(*) from invites where invite='" + uid + "' and new_user=0");
+        Vector<String[]> v=db.getValues("select count(*) from invites where invite='" + uid + "' and new_user=0");
         if (v.size()<=0) return false;
-        String s[] = (String[])v.get(0);
+        String s[] = v.get(0);
         if (Integer.parseInt(s[0])>0) return true;
         return false;        
     }
     
     public String createInvite(int id){
         if(testInvite(id)) return "";
-        int i= (int)count2();
+        int i= count2();
         Invites p = new Invites(i, id);
         db.insertInvite(p);
 //        db.commit();
@@ -717,9 +720,9 @@ public class UserWork {
      */
     public String getUserPropsValue(int user_id, String name){
         try{
-            Vector v=db.getUserProps(user_id);
+            Vector<String[]> v=db.getUserProps(user_id);
             for(int i=0;i<v.size();i++){
-                String[] ss = (String[])v.get(i);
+                String[] ss = v.get(i);
                 if(ss[0].equals(name)) return ss[1];
             }
         } catch (Exception ex) {
@@ -737,7 +740,7 @@ public class UserWork {
      */
     public String getUserGroupDefault(){
         String s = ChatProps.getInstance(serviceName).getStringProperty("auth.groups");
-        if(s.equals("")) return "user"; // Если по ошибке группы не определены
+        if(s.isEmpty()) return "user"; // Если по ошибке группы не определены
         return s.split(";")[0];
     }
     
@@ -747,7 +750,7 @@ public class UserWork {
     public String getUserGroup(int user_id){
         if(db.existUserProps(user_id)){
             String s = getUserPropsValue(user_id,"group");
-            if(s.equals(""))
+            if(s.isEmpty())
                 return getUserGroupDefault();
             else
                 return s;
@@ -762,20 +765,14 @@ public class UserWork {
         if(auth.containsKey(user_id)){
             return auth.get(user_id);
         }
-        String group = ChatProps.getInstance(serviceName).getStringProperty("auth.group_"+getUserGroup(user_id));
-        String grant = getUserPropsValue(user_id,"grant");
-        String revoke = getUserPropsValue(user_id,"revoke");
-        HashSet<String> r = new HashSet<String>();
+        String[] group = ChatProps.getInstance(serviceName).getStringProperty("auth.group_"+getUserGroup(user_id)).split(";");
+        String[] grant = getUserPropsValue(user_id,"grant").split(";");
+        String[] revoke = getUserPropsValue(user_id,"revoke").split(";");
+        HashSet<String> r = new HashSet<String>(((group.length+grant.length)-revoke.length));
         if(group==null) return r;
-        for(String s:group.split(";")){
-        	r.add(s);
-        }
-        for(String s:grant.split(";")){
-        	r.add(s);
-        }
-        for(String s:revoke.split(";")){
-        	if(r.contains(s)) r.remove(s);
-        }
+        r.addAll(Arrays.asList(group));
+        r.addAll(Arrays.asList(grant));
+        r.removeAll(Arrays.asList(revoke));
         auth.put(user_id, r);
         return r;
     }
@@ -829,10 +826,9 @@ public class UserWork {
      */
     private void saveUserAuth(int user_id) {
     	HashSet<String> u = getUserAuthObjects(user_id);
-    	HashSet<String> g = new HashSet<String>();
-    	for(String s:ChatProps.getInstance(serviceName).getStringProperty("auth.group_"+getUserGroup(user_id)).split(";")){
-    		g.add(s);
-    	}
+        String[] sd=ChatProps.getInstance(serviceName).getStringProperty("auth.group_"+getUserGroup(user_id)).split(";");
+    	HashSet<String> g = new HashSet<String>(sd.length);
+        g.addAll(Arrays.asList(sd));
     	String grant = "";
     	String revoke = "";
     	for(String s:u)
@@ -916,5 +912,25 @@ public class UserWork {
      */
     public Set<Integer> getRooms() {
     	return rw.getRooms();
+    }
+
+    /**
+     * Sql запроса с возращаемым типом int
+     * @param sql
+     * @return
+     */
+    public int getInt(String sql){
+        int i=1;
+    	try {
+    		Statement stm = db.getDb().createStatement();
+    		ResultSet rs = stm.executeQuery("select id from ads where enable=1");
+    		if(rs.next())
+    			i = rs.getInt(1);
+                rs.close();
+                stm.close();
+    	} catch (Exception ex){
+    		ex.printStackTrace();
+    	}
+        return i;
     }
 }

@@ -29,6 +29,7 @@ import ru.jimbot.modules.http.HttpConnection;
 import ru.jimbot.protocol.Protocol;
 import ru.jimbot.util.Log;
 import bsh.Interpreter;
+import ru.jimbot.util.MainProps;
 
 
 /**
@@ -41,7 +42,7 @@ private static String SCRIPT_FOLDER = "/scripts/"; // Папка с макрос
 private Thread th;
 private String tName="", tIn="";
 private ScriptCash scripts = new ScriptCash();
-private static ConcurrentHashMap<String,WorkScript> instances = new ConcurrentHashMap<String,WorkScript>();
+private static ConcurrentHashMap<String,WorkScript> instances = new ConcurrentHashMap<String,WorkScript>(MainProps.getServicesCount());
 private static WorkScript mainInst = new WorkScript("");
 private String sn=""; // Имя сервиса
 
@@ -55,7 +56,7 @@ private String sn=""; // Имя сервиса
      * @return
      */
     public static WorkScript getInstance(String name){
-        if(name.equals("")) return mainInst;
+        if(name.isEmpty()) return mainInst;
         if(!instances.containsKey(name)) instances.put(name, new WorkScript(name));
         return instances.get(name);
     }
@@ -193,25 +194,22 @@ private String sn=""; // Имя сервиса
      * @param proc
      */
     public void installAllChatCommandScripts(ChatCommandProc proc){
+    	try {
 //    	String sn = proc.srv.getName();
     	Log.info("Начинаю установку скриптов для " + sn);
-    	// Формируем список файлов
-    	Vector<String> v = new Vector<String>();
         File f = new File("./services/" + sn + SCRIPT_FOLDER + "command/");
         if(!f.exists()) return;
         if(!f.isDirectory()) return;
         File[] fs = f.listFiles();
+    	// Формируем список файлов
         if(fs.length>0)
         	for(int i=0;i<fs.length;i++){
         		if(fs[i].isFile())
-        			if(getExt(fs[i].getName()).equals("bsh"))
-        				v.add(getName(fs[i].getName()));
+        			if(getExt(fs[i].getName()).equals("bsh")){
+    		Log.info("Устанавливаю скрипт: " + getName(fs[i].getName()));
+    		Log.info("Завершено: " + installChatCommandScript(getName(fs[i].getName()),proc));
+                                }
         	}
-    	try {
-    		for(int i=0; i<v.size(); i++){
-    			Log.info("Устанавливаю скрипт: " + v.get(i));
-    			Log.info("Завершено: " + installChatCommandScript(v.get(i),proc));
-    		}
     	} catch (Exception ex){
     		ex.printStackTrace();
     	}
@@ -271,10 +269,11 @@ private String sn=""; // Имя сервиса
      * @return
      */
     public Vector<String> listHTTPScripts(){
-        Vector<String> v = new Vector<String>();
+        Vector<String> v=null;
         try{
             File f = new File("./scripts/http/");
             File[] fs = f.listFiles();
+        v = new Vector<String>(fs.length+1);
             if(fs.length<0) return v;
             for(int i=0;i<fs.length;i++){
                 if(fs[i].isFile())
@@ -308,14 +307,14 @@ private String sn=""; // Имя сервиса
     }
     
     private String getName(String s){
-        if(s.indexOf(".")<0) 
+        if(s.indexOf('.')<0)
             return s;
         else
             return s.replace('.', ':').split(":")[0];
     }
     
     private String getExt(String s){
-        if(s.indexOf(".")<0)
+        if(s.indexOf('.')<0)
             return "";
         else
             return s.replace('.', ':').split(":")[1];

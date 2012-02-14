@@ -40,9 +40,11 @@ public class MsgOutQueue implements Runnable {
     private int p_restart = 30000;
     private int lostMsg = 0; // Счетчик пропущенных сообщений
     private long t = 0; // Время последнего отправленного сообщения
+    private int num;
     
     /** Creates a new instance of MsgOutQueue */
-    public MsgOutQueue(Protocol pr, int pout, int prestart, int mlimit) {
+    public MsgOutQueue(Protocol pr, int pout, int prestart, int mlimit, int _num) {
+        num=_num;
         PAUSE_OUT = pout; PAUSE_RESTART=prestart; MSG_OUT_LIMIT=mlimit;
         sleepAmount = PAUSE_OUT; //Props.getIntProperty("bot.pauseOut");
         proc = pr;
@@ -74,7 +76,7 @@ public class MsgOutQueue implements Runnable {
         	q.add(new Msg(uin, msg, type));
         	return;
         }
-        int maxLenMsg = proc.getProps().getIntProperty("chat.MaxOutMsgSize");
+        int maxLenMsg = proc.getProps().getIntProperty("conn.MaxOutMsgSize"+num);
         int maxCountMsg = proc.getProps().getIntProperty("chat.MaxOutMsgCount");
         int m = (msg.length()/maxLenMsg+1) > maxCountMsg ? maxCountMsg : (msg.length()/maxLenMsg+1);
         for(int i=0; i<m; i++){

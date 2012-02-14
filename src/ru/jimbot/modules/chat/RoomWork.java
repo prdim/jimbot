@@ -34,10 +34,11 @@ import ru.jimbot.util.Log;
 public class RoomWork {
 	public DBChat db;
 	// Кеш комнат
-	private ConcurrentHashMap <Integer,Rooms> rc = new ConcurrentHashMap <Integer,Rooms>();
+	private ConcurrentHashMap <Integer,Rooms> rc;
 	
-	public RoomWork(DBChat _db){
+	public RoomWork(DBChat _db,int usr){
 		db = _db;
+                rc = new ConcurrentHashMap <Integer,Rooms>(usr);
 	}
 	
 	/**

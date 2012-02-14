@@ -34,11 +34,11 @@ implements MessageListener,ChatManagerListener,ConnectionListener {
 private XMPPConnection con;
 public AbstractProps  psp;
 private boolean connected = false;
-public XmmpProtocol(AbstractProps props){
+public XmmpProtocol(AbstractProps props, int num) {
 psp = props;
 mq = new MsgOutQueue(this, props.getIntProperty("bot.pauseOut"),
                 props.getIntProperty("bot.pauseRestart"),
-                props.getIntProperty("bot.msgOutLimit"));
+                props.getIntProperty("bot.msgOutLimit"),num);
 }
 //@Override
 //public ChatServer getChatServer(){

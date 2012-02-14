@@ -44,8 +44,8 @@ import ru.jimbot.util.MainProps;
  * @author Prolubnikov Dmitriy
  * 
  */
-public class Manager {
-	private HashMap<String,AbstractServer> services = new HashMap<String,AbstractServer>();
+public final class Manager {
+	private HashMap<String,AbstractServer> services = new HashMap<String,AbstractServer>(MainProps.getServicesCount());
 	private Monitor2 mon = new Monitor2();
 	private static Manager mn = null;
 	private ConcurrentHashMap<String, Object> data = null;
@@ -98,7 +98,7 @@ public class Manager {
 	public static Manager getInstance() {
 		if(mn==null){
 			mn = new Manager();
-			mn.data = new ConcurrentHashMap<String, Object>();
+			mn.data = new ConcurrentHashMap<String, Object>(1);
 		}
 		return mn;
 	}

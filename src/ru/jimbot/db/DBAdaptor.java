@@ -116,7 +116,7 @@ public abstract class DBAdaptor {
     }
     
     public Vector<String[]> getValues(String query) {
-        Vector<String[]> v = new Vector<String[]>();
+        Vector<String[]> v = new Vector<String[]>(5);
         String[] ss;
         ResultSet rst=null;
         Statement stmt=null;
@@ -174,18 +174,10 @@ public abstract class DBAdaptor {
         	if(stmt!=null) try{stmt.close();} catch(Exception e) {};
         }
         if (s==null) return 1;
-        if (s.equals("")) return 1;
+        if (s.isEmpty()) return 1;
         if (Long.parseLong(s) <= 0) return 1;
         return Long.parseLong(s) + 1;
     }
-    
-    public abstract DBObject getObject(String q);
-    
-    public abstract Vector getObjectVector(String q);
-    
-    public abstract void insertObject(DBObject o);
-    
-    public abstract void updateObject(DBObject o);
 
     /**
      * Возвращает Connection текущей БД.

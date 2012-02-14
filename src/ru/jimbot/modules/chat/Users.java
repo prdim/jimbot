@@ -18,15 +18,11 @@
 
 package ru.jimbot.modules.chat;
 
-import java.sql.Types;
-
-import ru.jimbot.db.DBObject;
-
 /**
  *
  * @author Prolubnikov Dmitry
  */
-public class Users extends DBObject {
+public class Users{
     public int id = 0;
     public String sn = "";
     public String nick="";
@@ -52,7 +48,6 @@ public class Users extends DBObject {
     
     /** Creates a new instance of Users */
     public Users() {
-        init();
         createtime = System.currentTimeMillis();
     }
     
@@ -88,18 +83,6 @@ public class Users extends DBObject {
         country = _country;
     }    
     
-    private void init(){
-        fields = new String[] {"id","sn","nick","localnick","fname","lname",
-            "email","city","homepage","gender","birthyear","birthmonth","birthday",
-            "age","country","language","state","basesn","createtime", "room", "lastkick"};
-        types = new int[] {Types.INTEGER, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-            Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-            Types.INTEGER, Types.INTEGER,Types.INTEGER,Types.INTEGER,Types.INTEGER,
-            Types.INTEGER,Types.INTEGER,Types.INTEGER,Types.VARCHAR,Types.TIMESTAMP,
-            Types.INTEGER, Types.TIMESTAMP};
-        tableName="users";        
-    }
-    
     public String getInfo(){
         String s = "User info id = " + id + '\n';
         s += "SN="+sn+'\n';
@@ -117,17 +100,6 @@ public class Users extends DBObject {
         s += "age="+age;
         if(state==-1) s += "\nuser banned";
         return s;
-    }    
-    
-    public String[] getFields(){
-        return fields;
     }
     
-    public int[] getTypes(){
-        return types;
-    }
-    
-    public String getTableName(){
-        return this.tableName;
-    }
 }

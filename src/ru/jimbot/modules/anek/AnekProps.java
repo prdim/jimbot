@@ -27,13 +27,14 @@ import java.util.Properties;
 import ru.jimbot.modules.AbstractProps;
 import ru.jimbot.table.UserPreference;
 import ru.jimbot.util.Log;
+import ru.jimbot.util.MainProps;
 
 /**
  *
  * @author Prolubnikov Dmitry
  */
 public class AnekProps implements AbstractProps {
-	public static HashMap<String,AnekProps> props = new HashMap<String,AnekProps>();
+	public static HashMap<String,AnekProps> props = new HashMap<String,AnekProps>(MainProps.getServicesCount());
     public String PROPS_FILE = "";
     private String PROPS_FOLDER = "";
     public String ENCODING = "windows-1251";
@@ -148,9 +149,10 @@ public class AnekProps implements AbstractProps {
      * @param uin
      * @param pass
      */
-    public void setUin(int i, String uin, String pass){
+    public void setUin(int i, String uin, String pass,int lenght){
     	setStringProperty("conn.uin"+i, uin);
     	setStringProperty("conn.pass"+i, pass);
+        setIntProperty("conn.MaxOutMsgSize"+i,lenght);
     }
     
     /**
@@ -159,11 +161,12 @@ public class AnekProps implements AbstractProps {
      * @param pass - пароль
      * @return - порядковый номер нового уина
      */
-    public int addUin(String uin, String pass){
+    public int addUin(String uin, String pass, int lenght){
     	int c = uinCount();
     	setIntProperty("conn.uinCount", c+1);
     	setStringProperty("conn.uin"+c, uin);
     	setStringProperty("conn.pass"+c, pass);
+        setIntProperty("conn.MaxOutMsgSize"+c,lenght);
     	return c;
     }
     
@@ -188,7 +191,7 @@ public class AnekProps implements AbstractProps {
     public boolean testAdmin(String uin) {
         if(uin.equals("0")) return true; //Выртуальный админ
         String s = getStringProperty("bot.adminUIN");
-        if(s.equals("")) return true;
+        if(s.isEmpty()) return true;
         String[] ss = s.split(";");
         try{
             for(int i=0;i<ss.length;i++){

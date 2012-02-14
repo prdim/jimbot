@@ -24,7 +24,6 @@ import java.sql.Statement;
 import java.util.Vector;
 
 import ru.jimbot.db.DBAdaptor;
-import ru.jimbot.db.DBObject;
 
 /**
  *
@@ -54,7 +53,7 @@ public class DBAneks extends DBAdaptor{
 //        }
     }
     
-    public DBObject getObject(String q){
+    public Aneks getObject(String q){
         Aneks an = new Aneks();
         Statement stm = null;
         ResultSet rs = null;
@@ -75,8 +74,8 @@ public class DBAneks extends DBAdaptor{
         return an;
     }
     
-    public Vector getObjectVector(String q){
-        Vector v = new Vector();
+    public Vector<Aneks> getObjectVector(String q){
+        Vector<Aneks> v = new Vector<Aneks>(1);
         Statement stm = null;
         ResultSet rs = null;
         try{
@@ -100,8 +99,7 @@ public class DBAneks extends DBAdaptor{
         
     }
     
-    public void insertObject(DBObject o){
-        Aneks an = (Aneks)o;
+    public void insertObject(Aneks an){
         try{
             PreparedStatement pst = getDb().prepareStatement("insert into aneks values (?, ?)");
             pst.setInt(1,an.id);
@@ -112,9 +110,5 @@ public class DBAneks extends DBAdaptor{
         } catch (Exception ex){
             ex.printStackTrace();
         }
-    }
-  
-    public void updateObject(DBObject o){
-        
     }
 }

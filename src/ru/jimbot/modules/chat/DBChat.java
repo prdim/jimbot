@@ -25,7 +25,6 @@ import java.sql.Timestamp;
 import java.util.Vector;
 
 import ru.jimbot.db.DBAdaptor;
-import ru.jimbot.db.DBObject;
 import ru.jimbot.util.Log;
 
 /**
@@ -132,7 +131,7 @@ public class DBChat extends DBAdaptor{
      * Возвращает параметры пользователя
      */
     public Vector<String[]> getUserProps(int user_id){
-        Vector<String[]> v=new Vector<String[]>();
+        Vector<String[]> v=new Vector<String[]>(3);
         try{
             v=getValues("select name, val from user_props where user_id="+user_id);
         } catch (Exception ex){
@@ -246,7 +245,7 @@ public class DBChat extends DBAdaptor{
         }
     }
     
-    public DBObject getObject(String q){
+    public Users getObject(String q){
         Users us = new Users();
         ResultSet rSet=null;
         Statement stmt=null;
@@ -293,7 +292,7 @@ public class DBChat extends DBAdaptor{
     }
     
     public Vector<Users> getObjectVector(String q){
-        Vector<Users> v = new Vector<Users>();
+        Vector<Users> v = new Vector<Users>(5);
         ResultSet rSet=null;
         Statement stmt=null;
         try{
@@ -342,8 +341,7 @@ public class DBChat extends DBAdaptor{
         
     }
     
-    public void insertObject(DBObject o){
-        Users us = (Users)o;
+    public void insertObject(Users us){
         Log.debug("INSERT user id=" + us.id);
         try{
             PreparedStatement pst = getDb().prepareStatement("insert into users values (?, ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
@@ -376,8 +374,7 @@ public class DBChat extends DBAdaptor{
         }
     }
 
-    public void updateObject(DBObject o){
-        Users us = (Users)o;
+    public void updateObject(Users us){
         Log.debug("UPDATE user id=" + us.id);
         try{
             PreparedStatement pst = getDb().prepareStatement("update users set sn=?,nick=?," + 

@@ -48,9 +48,10 @@ public class ChatQueue implements Runnable {
         srv = s;
         psp = ChatProps.getInstance(srv.getName());
         sleepAmount = psp.getIntProperty("chat.pauseOut");
+        int usr=srv.us.statUsersCount();
         mq = new ConcurrentLinkedQueue<MsgElement>();
-        uq = new ConcurrentHashMap<String,UinElement>();
-        mmq = new ConcurrentHashMap<Integer, ConcurrentLinkedQueue<MsgElement>>();
+        uq = new ConcurrentHashMap<String,UinElement>(usr);
+        mmq = new ConcurrentHashMap<Integer, ConcurrentLinkedQueue<MsgElement>>(usr);
     }
     
     /**
@@ -148,9 +149,9 @@ public class ChatQueue implements Runnable {
     
     public synchronized void send(){
     	try {
-    		if (uq.size() == 0)
+    		if (uq.isEmpty())
 				return;
-			if (mq.size() == 0)
+			if (mq.isEmpty())
 				return;
 			// Распихиваем все сообщения по очередям комнат
 			while (!mq.isEmpty()) {
@@ -168,7 +169,7 @@ public class ChatQueue implements Runnable {
 			for (String c : uq.keySet()) {
 				String s = createMsg(c);
 				((ChatCommandProc) srv.cmd).testState(c);
-				if (!s.equals("") && uq.containsKey(c))
+				if (!s.isEmpty() && uq.containsKey(c))
 					srv.getIcqProcess(uq.get(c).baseUin).mq.add(uq.get(c).uin,
 							s);
 			}

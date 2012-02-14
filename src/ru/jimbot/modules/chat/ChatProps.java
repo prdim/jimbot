@@ -29,13 +29,14 @@ import java.util.Properties;
 import ru.jimbot.modules.AbstractProps;
 import ru.jimbot.table.UserPreference;
 import ru.jimbot.util.Log;
+import ru.jimbot.util.MainProps;
 
 /**
  *
  * @author Prolubnikov Dmitry
  */
 public class ChatProps implements AbstractProps {
-	public static HashMap<String,ChatProps> props = new HashMap<String,ChatProps>();
+	public static HashMap<String,ChatProps> props = new HashMap<String,ChatProps>(MainProps.getServicesCount());
     public String PROPS_FILE = "";
     private String PROPS_FOLDER = "";
     public String ENCODING = "windows-1251";
@@ -235,7 +236,7 @@ public class ChatProps implements AbstractProps {
     public boolean testAdmin(String uin) {
         if(uin.equals("0")) return true; //Выртуальный админ
         String s = getStringProperty("bot.adminUIN");
-        if(s.equals("")) return false;
+        if(s.isEmpty()) return false;
         String[] ss = s.split(";");
         try{
             for(int i=0;i<ss.length;i++){
@@ -327,9 +328,10 @@ public class ChatProps implements AbstractProps {
      * @param uin
      * @param pass
      */
-    public void setUin(int i, String uin, String pass){
+    public void setUin(int i, String uin, String pass, int lenght){
     	setStringProperty("conn.uin"+i, uin);
-    	if(!pass.equals("")) setStringProperty("conn.pass"+i, pass);
+    	if(!pass.isEmpty()) setStringProperty("conn.pass"+i, pass);
+        setIntProperty("conn.MaxOutMsgSize"+i,lenght);
     }
     
     /**
@@ -338,11 +340,12 @@ public class ChatProps implements AbstractProps {
      * @param pass - пароль
      * @return - порядковый номер нового уина
      */
-    public int addUin(String uin, String pass){
+    public int addUin(String uin, String pass, int lenght){
     	int c = uinCount();
     	setIntProperty("conn.uinCount", c+1);
     	setStringProperty("conn.uin"+c, uin);
     	setStringProperty("conn.pass"+c, pass);
+        setIntProperty("conn.MaxOutMsgSize"+c,lenght);
     	return c;
     }
     

@@ -36,14 +36,14 @@ public class UINmanager implements Runnable {
         proc = new HashMap<String,Protocol>(psp.uinCount());
         for(int i=0;i<ic.length;i++){
             if(isuin(ic[i])){
-            IcqProtocol iprot = new IcqProtocol(psp);
+            IcqProtocol iprot = new IcqProtocol(psp,i);
             iprot.server="login.icq.com";
             iprot.screenName = ic[i];
             iprot.password = ps[i];
             iprot.baseUin=ic[i];
             proc.put(ic[i], iprot);
             }else{
-            XmmpProtocol xmmp = new XmmpProtocol(psp);
+            XmmpProtocol xmmp = new XmmpProtocol(psp,i);
             xmmp.port=5222;
             xmmp.server=ic[i].split("@")[1];
             xmmp.screenName = ic[i].split("@")[0];
@@ -54,7 +54,7 @@ public class UINmanager implements Runnable {
         }
     }
 
-    public void stopс() {
+    public void stop() {
         for(Protocol p:proc.values()){
             p.disconnect();
         }
@@ -66,7 +66,7 @@ public class UINmanager implements Runnable {
         th.start();
     }
 
-    public synchronized void stop() {
+    public synchronized void stops() {
         th = null;
         notify();
     }
@@ -81,7 +81,7 @@ public class UINmanager implements Runnable {
                 Thread.sleep(22000);
             } catch (InterruptedException e) {}
            }
-        stop();
+        stops();
     }
 
     public static boolean isuin(String uin){

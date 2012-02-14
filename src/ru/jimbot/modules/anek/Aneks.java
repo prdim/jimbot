@@ -17,44 +17,20 @@
  */
 
 package ru.jimbot.modules.anek;
-
-import java.sql.Types;
-
-import ru.jimbot.db.DBObject;
 /**
  *
  * @author Prolubnikov Dmitry
  */
-public class Aneks extends DBObject {
+public class Aneks{
     public int id=0;
     public String text = "";
     
     /** Creates a new instance of Aneks */
     public Aneks() {
-        init();
     }
     
     public Aneks(int i, String s) {
-       init();
        id=i;
        text=s;
-    }
-    
-    private void init(){
-        fields = new String[] {"id","text"};
-        types = new int[] {Types.INTEGER, Types.LONGVARCHAR};
-        tableName="aneks";        
-    }
-    
-    public String[] getFields(){
-        return fields;
-    }
-    
-    public int[] getTypes(){
-        return types;
-    }
-    
-    public String getTableName(){
-        return this.tableName;
     }
 }
