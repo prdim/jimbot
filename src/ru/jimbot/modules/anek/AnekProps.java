@@ -65,8 +65,10 @@ public class AnekProps implements AbstractProps {
         setIntProperty("conn.uinCount",1);
         setStringProperty("conn.uin0","111");
         setStringProperty("conn.pass0","Password");
+        setIntProperty("conn.MaxOutMsgSize0", 800);
+        setIntProperty("icq.client", 1);
         setIntProperty("icq.status",0/*Icq.STATUS_ONLINE*/);
-        setIntProperty("icq.xstatus",0);
+        setIntProperty("icq.xstatus",1);
 //        setIntProperty("icq.statusFlag",0);
         setIntProperty("bot.pauseIn",3000); //Пауза входящих сообщений
         setIntProperty("bot.pauseOut",500); //Пауза исходящих сообщений
@@ -74,8 +76,8 @@ public class AnekProps implements AbstractProps {
         setIntProperty("bot.pauseRestart",11*60*1000); //Пауза перед запуском упавшего коннекта
         setStringProperty("bot.adminUIN","111111;222222");
         setIntProperty("icq.AUTORETRY_COUNT",5);
-        setStringProperty("icq.STATUS_MESSAGE1","");
-        setStringProperty("icq.STATUS_MESSAGE2","");
+        setStringProperty("icq.STATUS_MESSAGE1","...");
+        setStringProperty("icq.STATUS_MESSAGE2","...");
         setBooleanProperty("bot.useAds",false);
         setIntProperty("bot.adsRate",3);
         setBooleanProperty("main.StartBot",false);

@@ -68,6 +68,8 @@ public class ChatProps implements AbstractProps {
         setIntProperty("conn.uinCount",1);
         setStringProperty("conn.uin0","111");
         setStringProperty("conn.pass0","Password");
+        setIntProperty("conn.MaxOutMsgSize0", 800);
+        setIntProperty("icq.client", 1);
         
         setIntProperty("chat.pauseOut",5000);
         setBooleanProperty("chat.IgnoreOfflineMsg",true);
@@ -79,7 +81,7 @@ public class ChatProps implements AbstractProps {
         setIntProperty("chat.MaxOutMsgSize",500);
         setIntProperty("chat.MaxOutMsgCount",5);
         setIntProperty("icq.status",0/*Icq.STATUS_ONLINE*/);
-        setIntProperty("icq.xstatus",0);
+        setIntProperty("icq.xstatus",1);
 //        setIntProperty("icq.statusFlag",0);
         setBooleanProperty("main.StartBot",false);
         setIntProperty("bot.pauseIn",3000); //Пауза входящих сообщений
@@ -90,8 +92,8 @@ public class ChatProps implements AbstractProps {
         setIntProperty("chat.autoKickTime",60);
         setIntProperty("chat.autoKickTimeWarn",58);
         setIntProperty("icq.AUTORETRY_COUNT",5);
-        setStringProperty("icq.STATUS_MESSAGE1","");
-        setStringProperty("icq.STATUS_MESSAGE2","");
+        setStringProperty("icq.STATUS_MESSAGE1","...");
+        setStringProperty("icq.STATUS_MESSAGE2","...");
         setBooleanProperty("chat.ignoreMyMessage", true);
         setBooleanProperty("chat.isAuthRequest", false);
         setStringProperty("chat.badNicks","admin;админ");

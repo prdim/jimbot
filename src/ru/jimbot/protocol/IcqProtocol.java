@@ -212,21 +212,21 @@ public class IcqProtocol
     }
 
     public void addContactList(String uin) {
-        OscarInterface.findUsersByUIN(con, uin);
-        try{
-            con.getContactList().addGroup("General");
-            con.getContactList().addContact(uin, "General");
-        } catch (ContactListOperationException ex) {
+//        OscarInterface.findUsersByUIN(con, uin);
+//        try{
+//            con.getContactList().addGroup("General");
+//            con.getContactList().addContact(uin, "General");
+//        } catch (ContactListOperationException ex) {
 //            ex.printStackTrace();
-        }
+//        }
     }
 
     public void RemoveContactList(String uin) {
-        try {
-            con.getContactList().removeContact(uin);
-        } catch (ContactListOperationException ex) {
+//        try {
+//            con.getContactList().removeContact(uin);
+//        } catch (ContactListOperationException ex) {
 ////            ex.printStackTrace();
-        }
+//        }
     }
 
     @Override

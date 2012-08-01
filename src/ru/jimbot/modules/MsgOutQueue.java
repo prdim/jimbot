@@ -18,6 +18,7 @@
 
 package ru.jimbot.modules;
 
+import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import ru.jimbot.protocol.Protocol;
@@ -143,9 +144,11 @@ public class MsgOutQueue implements Runnable {
             }
             if(stopCon>0) {
                 if((System.currentTimeMillis()-stopCon)>=p_restart/*PAUSE_RESTART/*Props.getIntProperty("bot.pauseRestart")*/){
+                    if(UINmanager.isuin(proc.screenName)){
                     MainProps.nextServer();
                     proc.server = MainProps.getServer();
                     proc.port = MainProps.getPort();
+                    }
                     Log.info("Попытка нового подключения... " + proc.server + ":" + proc.port);
                     proc.reConnect();
                     stopCon=System.currentTimeMillis();
