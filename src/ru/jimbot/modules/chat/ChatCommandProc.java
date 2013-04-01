@@ -303,7 +303,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
                 		e.addMsg(tmsg);
             			floodNoReg.put(uin, e);
                 	} else {
-                		FloodElement e = new FloodElement(psp.getIntProperty("chat.floodTimeLimitNoReg")*1000);
+                		FloodElement e = new FloodElement(psp.getIntProperty("chat.floodTimeLimitNoReg")*1000, psp.getIntProperty("chat.floodMsgLimit"));
                 		floodNoReg.put(uin, e);
                 	}
                 	if(tmsg.charAt(0)!='!' && !comMap.containsKey(uin)){
@@ -336,7 +336,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
             	e.addMsg(tmsg);
             	floodMap.put(uin, e);
             } else {
-            	FloodElement e = new FloodElement(psp.getIntProperty("chat.floodTimeLimit")*1000);
+            	FloodElement e = new FloodElement(psp.getIntProperty("chat.floodTimeLimit")*1000, psp.getIntProperty("chat.floodMsgLimit"));
             	e.addMsg(tmsg);
             	floodMap.put(uin, e);
             }
@@ -1986,7 +1986,7 @@ public class ChatCommandProc extends AbstractCommandProcessor {
     		e.addMsg("1");
     		floodMap2.put(uin, e);
     	} else {
-    		FloodElement e = new FloodElement(psp.getIntProperty("chat.floodTimeLimit")*1000);
+    		FloodElement e = new FloodElement(psp.getIntProperty("chat.floodTimeLimit")*1000, psp.getIntProperty("chat.floodMsgLimit"));
     		e.addMsg("1");
     		floodMap2.put(uin, e);
     	}

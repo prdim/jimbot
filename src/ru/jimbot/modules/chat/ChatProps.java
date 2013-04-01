@@ -130,6 +130,7 @@ public class ChatProps implements AbstractProps {
         setStringProperty("chat.inviteDescription","Для регистрации в чате вам необходимо получить приглашение одного из пользователей.");
         setIntProperty("chat.floodCountLimit",5);
         setIntProperty("chat.floodTimeLimit",10);
+        setIntProperty("chat.floodMsgLimit", 5);
         setIntProperty("chat.floodTimeLimitNoReg",20);
         setStringProperty("db.host","localhost:3306");
         setStringProperty("db.user","root");
@@ -163,6 +164,7 @@ public class ChatProps implements AbstractProps {
             new UserPreference(UserPreference.CATEGORY_TYPE,"chat", "Настройки чата",""),
             new UserPreference(UserPreference.INTEGER_TYPE,"chat.floodCountLimit","Число повторов флуда",getIntProperty("chat.floodCountLimit")),
             new UserPreference(UserPreference.INTEGER_TYPE,"chat.floodTimeLimit","Период флуда (сек)",getIntProperty("chat.floodTimeLimit")),
+            new UserPreference(UserPreference.INTEGER_TYPE,"chat.floodMsgLimit","Колличество сообщений для проверки на флуд",getIntProperty("chat.floodTimeLimit")),
             new UserPreference(UserPreference.INTEGER_TYPE,"chat.floodTimeLimitNoReg","Пауза сообщений для незареганых (сек)",getIntProperty("chat.floodTimeLimitNoReg")),
             new UserPreference(UserPreference.INTEGER_TYPE,"chat.pauseOut","Задержка очереди чата",getIntProperty("chat.pauseOut")),
             new UserPreference(UserPreference.BOOLEAN_TYPE,"chat.IgnoreOfflineMsg","Игнорировать оффлайн сообщения",getBooleanProperty("chat.IgnoreOfflineMsg")),
